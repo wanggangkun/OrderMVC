@@ -1,0 +1,80 @@
+﻿@model List<OrderDemo1.Models.Cart>
+
+@{ 
+    var ajaxOption = new AjaxOptions()
+    {
+        OnSuccess = "RemoveCartSuccess",
+        OnFailure = "RemoveCartFailure",
+        Confirm = "您确定要从购物车中删除这个商品？",
+        HttpMethod = "Post"
+    };
+}
+
+@section scripts
+{
+    <script>
+        function RemoveCartSuccess()
+        {
+            alert('移除购物车成功');
+            location.reload();
+        }
+        function RemoveCartFailure(xhr)
+        {
+            alert('移除购物车失败(Http 状态码:'+xhr.status+')');
+        }
+    </script>
+}
+
+@{
+    ViewBag.Title = "我的菜";
+}
+
+<h2>我要吃：</h2>
+
+@using (Html.BeginForm("UpdateAmount", "Cart"))
+{
+    <table class="table table-striped" style="font-size:30px">
+        <tr>
+            <th>名称</th>
+            <th>单价</th>
+            <th>数量</th>
+            <th>小计</th>
+        </tr>
+        @{ int subTotal = 0;}
+        @for(int i=0;i<Model.Count;i++)
+        {
+            //计算购买商品总价
+            subTotal += Model[i].Product.Price * Model[i].Amount;
+            //选择商品数量的菜单只能选择1~3
+            var ddlAmountList = new SelectList(Enumerable.Range(1, 3), Model[i].Amount);
+
+            @Html.HiddenFor(modelItem=>Model[i].Product.Id)
+
+            <tr>
+                <td>@Html.DisplayFor(ModelItem=>Model[i].Product.Name)</td>
+                <td>¥ @(Model[i].Product.Price)</td>
+                <td>@Html.DropDownListFor(modelItem=>Model[i].Amount,ddlAmountList)</td>
+                <td>¥ @(Model[i].Product.Price*Model[i].Amount)</td>
+                <td>
+                    @Ajax.ActionLink("删除","Remove", new { ProductId=Model[i].Product.Id},ajaxOption)
+                </td>
+            </tr>
+        }
+        <tr>
+            <th></th>
+            <th></th>
+            <th>总价</th>
+            <th id="subtotal">¥ @subTotal</th>
+            <th></th>
+        </tr>
+    </table>
+    <p>
+        <input type="submit" value="更新数量" class="btn btn-info btn-lg"/>       
+        <input type="button" value="完成订单" class="btn btn-success btn-lg" 
+               onclick="location.href='@Url.Action("Complete","Order")';" />
+    </p>
+}
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+<script src="~/scripts/jquery.unobtrusive-ajax.js"></script>

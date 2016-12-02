@@ -1,0 +1,15 @@
+﻿@model List<OrderDemo1.Models.ProductCategory>
+
+@{
+    ViewBag.Title = "我要吃饭";
+}
+
+<h2>@Html.DisplayNameFor(model => model[0])</h2>
+
+<ul>
+
+@foreach (var item in Model) {
+    <li style="font-size: 80px">@Html.ActionLink(item.Name,"ProductList",new { id=item.Id})</li>
+}
+
+</ul>

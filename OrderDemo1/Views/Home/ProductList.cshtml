@@ -1,0 +1,46 @@
+﻿@model IEnumerable<OrderDemo1.Models.Product>
+
+@{
+    ViewBag.Title = "点菜";
+}
+
+@{ 
+    var ajaxOption = new AjaxOptions()
+    {
+        OnSuccess = "AddToCartSuccess",
+        OnFailure = "AddToCartFailure",
+        HttpMethod = "Post"
+    };
+}
+
+@section scripts
+{
+    <script>
+        function AddToCartSuccess()
+        {
+            alert('添加购物车成功');
+        }
+        function AddToCartFailture(xhr)
+        {
+            alert('添加购物车失败(Http 状态码:'+xhr.status+')');
+        }
+    </script>
+}
+
+<h2>@Model.First().ProductCategory.Name ：</h2>
+
+
+@foreach (var item in Model)
+{
+    <div class="col-sm-6 col-md-4">
+        <img src="~/pictures/@Html.DisplayFor(modelItem => item.Picture)" class="img-thumbnail" />
+        <h3>@Html.DisplayFor(modelItem => item.Name)</h3>
+        <h4>¥  @Html.DisplayFor(modelItem => item.Price)</h4>
+        <p>@Ajax.ActionLink("添加购物车", "AddToCart", "Cart", new { ProductId = item.Id }, ajaxOption)</p>
+    </div>
+}
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+<script src="~/scripts/jquery.unobtrusive-ajax.js"></script>
